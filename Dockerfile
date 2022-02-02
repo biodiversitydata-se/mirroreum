@@ -4,7 +4,7 @@ FROM rocker/ml-verse:4.0.5
 # environment variables
 ENV SHINY_SERVER_VERSION 1.5.16.958
 # add GITHUB_PAT due to rate limiting kicking in when installing packages
-ARG GITHUB_PAT= 
+ARG GITHUB_PAT=
 ENV GITHUB_PAT=$GITHUB_PAT
 
 WORKDIR /rocker_scripts
@@ -17,19 +17,21 @@ RUN ./install_shiny_server.sh && \
 COPY rocker_scripts/install_tini.sh \
 	rocker_scripts/install_shinytools.sh \
 	rocker_scripts/install_apitools.sh \
+	rocker_scripts/install_BiocManager.sh \
 	./
 
-# install extended set of packages	
+# install extended set of packages
 RUN ./install_tini.sh && \
 	./install_shinytools.sh && \
-	./install_apitools.sh
+	./install_apitools.sh && \
+	./install_BiocManager.sh
 
 # install R packages from CRAN
 
 COPY rocker_scripts/install_biodiversity.sh \
 	rocker_scripts/pkgs-cran \
 	./
-	
+
 RUN ./install_biodiversity.sh
 
 # install R packages from GitHub
@@ -37,7 +39,7 @@ RUN ./install_biodiversity.sh
 COPY rocker_scripts/install_sbdi.sh \
 	rocker_scripts/pkgs-github \
 	./
-	
+
 RUN ./install_sbdi.sh
 
 WORKDIR /
