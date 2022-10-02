@@ -1,0 +1,31 @@
+version: '3.7'
+
+networks:
+  basnet:
+    external: true
+
+services:
+
+  mirroreum:
+    image: ghcr.io/biodiversitydata-se/mirroreum:1.0.2
+    env_file: ./env/.envmirroreum
+    volumes:
+      - data_mirroreum:/home/rstudio
+      - ./login.html:/etc/rstudio/login.html:ro
+      - ./rserver.conf:/etc/rstudio/rserver.conf
+    command: /init 
+    networks:
+      - basnet
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+volumes:
+  data_mirroreum:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: nfsvers=4,addr=beta.bioatlas.se,rw
+      device: ":/mnt/extvol/nfs/data/data_mirroreum"
